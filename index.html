@@ -1,0 +1,2342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SmartHealth - AI Health Assistant</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    /* ========== COLOR PALETTE (APOLLO-INSPIRED) ========== */
+    :root {
+      --primary: #0066cc;
+      --primary-dark: #004499;
+      --primary-light: #e6f0ff;
+      --secondary: #00a8a8;
+      --accent: #ffd700;
+      --accent-light: #fff3cd;
+      --success: #00b88a;
+      --warning: #ff9800;
+      --danger: #e74c3c;
+      --light: #f5f7fa;
+      --lighter: #f0f3f8;
+      --gray: #616770;
+      --gray-light: #dfe3e8;
+      --gray-lighter: #f0f3f8;
+      --white: #ffffff;
+      --shadow-sm: 0 2px 8px rgba(0, 102, 204, 0.08);
+      --shadow-md: 0 4px 16px rgba(0, 102, 204, 0.12);
+      --shadow-lg: 0 12px 32px rgba(0, 102, 204, 0.16);
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+      background: linear-gradient(135deg, #ffffff 0%, #f5f7fa 50%, #e8eef7 100%);
+      min-height: 100vh;
+      color: #2c3e50;
+      overflow: hidden;
+      margin: 0;
+      padding: 0;
+    }
+    
+    /* ========== HEADER ========== */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(10px);
+      padding: 16px 0;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+      border-bottom: 1px solid rgba(0, 102, 204, 0.08);
+      z-index: 100;
+      height: 70px;
+      display: flex;
+      align-items: center;
+    }
+    
+    .header-content {
+      max-width: 1400px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 0 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    header h1 {
+      color: var(--primary);
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin: 0;
+    }
+    
+    header p {
+      color: var(--secondary);
+      font-size: 13px;
+      font-weight: 600;
+      margin: 0;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    
+    /* ========== MAIN CONTAINER ========== */
+    .container {
+      max-width: 100%;
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    /* ========== SCREEN SYSTEM ========== */
+    .screen {
+      display: none;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      animation: fadeInScreen 0.5s ease-in-out;
+      padding-top: 70px;
+    }
+    
+    .screen.active {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    @keyframes fadeInScreen {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    .screen-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 60px 40px 40px 40px;
+    }
+    
+    /* ========== HERO SECTION ========== */
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+      padding: 80px 40px;
+      max-width: 1400px;
+      margin: 0 auto;
+      width: 100%;
+    }
+    
+    .hero-content h2 {
+      color: var(--primary-dark);
+      font-size: 48px;
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 20px;
+      letter-spacing: -0.8px;
+    }
+    
+    .hero-content p {
+      color: var(--gray);
+      font-size: 18px;
+      line-height: 1.7;
+      margin: 0;
+    }
+    
+    .hero-illustration {
+      text-align: center;
+      font-size: 280px;
+      opacity: 0.95;
+    }
+    
+    /* ========== SCREEN CARD STYLING ========== */
+    .screen-card {
+      background: white;
+      border-radius: 20px;
+      padding: 50px 45px;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid rgba(0, 102, 204, 0.05);
+      max-width: 700px;
+      width: 100%;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    
+    .screen-title {
+      color: var(--primary-dark);
+      font-size: 36px;
+      font-weight: 800;
+      line-height: 1.3;
+      margin: 0;
+      letter-spacing: -0.5px;
+    }
+    
+    .screen-subtitle {
+      color: var(--gray);
+      font-size: 16px;
+      line-height: 1.6;
+      margin: 0;
+    }
+    
+    /* ========== SLIDES & STEP CARDS (DEPRECATED) ========== */
+    .slides-container {
+      display: none;
+    }
+    
+    .slide {
+      display: none !important;
+    }
+    
+    /* ========== QUICK SELECT BUTTONS ========== */
+    .quick-select {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin: 24px 0;
+      flex: 1;
+      width: 100%;
+    }
+    
+    .quick-btn {
+      padding: 18px 20px;
+      border: 2px solid var(--gray-light);
+      background: white;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      text-align: left;
+      font-size: 15px;
+      color: var(--primary-dark);
+    }
+    
+    .quick-btn:hover {
+      border-color: var(--primary);
+      background: var(--primary-light);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .quick-btn.selected {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+      box-shadow: var(--shadow-md);
+    }
+    
+    /* ========== HORIZONTAL PROGRESS TRACKER ========== */
+    .progress-tracker {
+      position: fixed;
+      top: 70px;
+      left: 0;
+      right: 0;
+      display: none;
+      justify-content: space-between;
+      align-items: center;
+      background: white;
+      padding: 16px 40px;
+      z-index: 99;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+      border-bottom: 1px solid var(--gray-light);
+      height: 60px;
+    }
+    
+    .progress-tracker.visible {
+      display: flex;
+    }
+    
+    .progress-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+      position: relative;
+    }
+    
+    .progress-step:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      width: 50%;
+      height: 2px;
+      background: var(--gray-light);
+      transition: background 0.3s ease;
+    }
+    
+    .progress-step.active:not(:last-child)::after {
+      background: var(--accent);
+    }
+    
+    .progress-circle {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--light);
+      border: 2px solid var(--gray-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: var(--gray);
+      transition: all 0.3s ease;
+      font-size: 12px;
+    }
+    
+    .progress-step.active .progress-circle {
+      background: var(--accent);
+      color: #2c3e50;
+      border-color: var(--accent);
+    }
+    
+    .progress-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--gray);
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      transition: color 0.3s ease;
+    }
+    
+    .progress-step.active .progress-label {
+      color: var(--primary);
+    }
+    
+    /* ========== SYMPTOM INPUT ========== */
+    .input-field {
+      display: flex;
+      flex-direction: column;
+      margin: 24px 0;
+      flex: 1;
+      text-align: left;
+    }
+    
+    .input-field label {
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: var(--primary-dark);
+      font-size: 15px;
+    }
+    
+    .input-wrapper {
+      position: relative;
+    }
+    
+    textarea {
+      width: 100%;
+      padding: 16px 18px;
+      border: 2px solid var(--gray-light);
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 15px;
+      resize: vertical;
+      min-height: 100px;
+      transition: all 0.3s ease;
+      background: white;
+      color: var(--primary-dark);
+    }
+    
+    textarea::placeholder {
+      color: var(--gray);
+      opacity: 0.5;
+    }
+    
+    textarea:hover {
+      border-color: var(--primary);
+      background: var(--primary-light);
+    }
+    
+    textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      background: white;
+      box-shadow: 0 0 0 4px rgba(0, 102, 204, 0.1);
+    }
+    
+    /* Symptom chips */
+    .symptom-chips {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin: 20px 0;
+      padding: 16px;
+      background: var(--light);
+      border-radius: 12px;
+    }
+    
+    .symptom-chip {
+      padding: 10px 18px;
+      background: white;
+      border: 2px solid var(--gray-light);
+      border-radius: 24px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--primary);
+      transition: all 0.2s ease;
+    }
+    
+    .symptom-chip:hover {
+      border-color: var(--primary);
+      background: var(--primary-light);
+      transform: scale(1.05);
+    }
+    
+    .symptom-chip.selected {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+    
+    /* Character counter */
+    .char-counter {
+      font-size: 12px;
+      color: var(--gray);
+      margin-top: 8px;
+      text-align: right;
+    }
+    
+    /* ========== SLIDE NAVIGATION ========== */
+    .slide-navigation {
+      display: flex;
+      gap: 16px;
+      margin-top: 40px;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 24px;
+      border-top: 1px solid var(--gray-light);
+    }
+    
+    /* ========== RESULTS CARD ========== */
+    .result-card {
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: var(--shadow-md);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+    }
+    
+    .result-card h3 {
+      color: var(--primary-dark);
+      margin-bottom: 20px;
+      font-size: 24px;
+    }
+    
+    .severity-badge {
+      display: inline-block;
+      padding: 10px 18px;
+      border-radius: 20px;
+      color: white;
+      font-weight: 600;
+      margin-bottom: 24px;
+      font-size: 14px;
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .severity-badge.severity-green {
+      background: linear-gradient(135deg, #38b6a8, #2d9b92);
+    }
+    
+    .severity-badge.severity-yellow {
+      background: linear-gradient(135deg, #f5a623, #e59600);
+    }
+    
+    .severity-badge.severity-red {
+      background: linear-gradient(135deg, #e74c3c, #c0392b);
+    }
+    
+    .condition-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--gray-light);
+      transition: all 0.2s ease;
+    }
+    
+    .condition-item:hover {
+      background: var(--lighter);
+      padding-left: 8px;
+      padding-right: 8px;
+      border-radius: 8px;
+    }
+    
+    .condition-name {
+      font-weight: 600;
+      color: var(--primary-dark);
+    }
+    
+    .probability {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .probability-bar {
+      width: 120px;
+      height: 6px;
+      background: var(--gray-light);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    
+    .probability-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      transition: width 0.4s ease;
+    }
+    
+    .probability-text {
+      font-weight: 600;
+      color: var(--primary);
+      min-width: 45px;
+      text-align: right;
+      font-size: 14px;
+    }
+    
+    .recommendations-box {
+      margin-top: 32px;
+    }
+    
+    .recommendations-box h4 {
+      color: var(--primary-dark);
+      margin-bottom: 16px;
+      font-size: 18px;
+    }
+    
+    .recommendations-box ul {
+      list-style: none;
+    }
+    
+    .recommendations-box li {
+      padding: 10px 0;
+      color: var(--gray);
+      padding-left: 24px;
+      position: relative;
+      line-height: 1.6;
+    }
+    
+    .recommendations-box li:before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: var(--success);
+      font-weight: bold;
+      font-size: 16px;
+    }
+    
+    /* ========== SCREEN CARD STYLING ========== */
+    .screen-card {
+      background: white;
+      border-radius: 24px;
+      padding: 48px 40px;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      max-width: 700px;
+      width: 100%;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    
+    /* AI Avatar */
+    .ai-avatar {
+      font-size: 80px;
+      margin-bottom: 16px;
+      animation: bounce 2s ease-in-out infinite;
+    }
+    
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    
+    /* Screen Titles */
+    .screen-title {
+      color: var(--primary-dark);
+      font-size: 32px;
+      font-weight: 700;
+      line-height: 1.3;
+      margin: 0;
+      letter-spacing: -0.5px;
+    }
+    
+    .screen-subtitle {
+      color: var(--gray);
+      font-size: 16px;
+      line-height: 1.6;
+      margin: 0;
+    }
+    
+    /* Screen Buttons Group */
+    .screen-buttons {
+      display: flex;
+      flex-direction: column;
+    /* ========== SCREEN BUTTONS GROUP ========== */
+    .screen-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 24px;
+      width: 100%;
+    }
+    
+    .button-row {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      width: 100%;
+    }
+    
+    /* ========== INPUT STYLES ========== */
+    input[type="text"],
+    input[type="email"] {
+      width: 100%;
+      padding: 12px 14px;
+      margin-bottom: 12px;
+      border: 2px solid var(--gray-light);
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 14px;
+      transition: all 0.3s ease;
+    }
+    
+    input[type="text"]:hover,
+    input[type="email"]:hover {
+      border-color: var(--primary);
+    }
+    
+    input[type="text"]:focus,
+    input[type="email"]:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(0, 102, 204, 0.1);
+    }
+    
+    /* ========== UTILITIES ========== */
+    .spinner {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 4px solid rgba(255, 255, 255, 0.3);
+      border-top-color: white;
+      animation: spin 0.9s linear infinite;
+      display: inline-block;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    /* ========== RESPONSIVE ========== */
+    @media (max-width: 768px) {
+      .screen-content {
+        padding: 60px 20px 20px 20px;
+      }
+      
+      .screen-card {
+        padding: 40px 24px;
+      }
+      
+      .hero {
+        grid-template-columns: 1fr;
+        gap: 40px;
+        padding: 60px 24px;
+      }
+      
+      .hero-content h2 {
+        font-size: 32px;
+      }
+      
+      .hero-content p {
+        font-size: 16px;
+      }
+      
+      .hero-illustration {
+        font-size: 180px;
+      }
+      
+      .screen-title {
+        font-size: 28px;
+      }
+      
+      .quick-select {
+        grid-template-columns: 1fr;
+      }
+      
+      .progress-tracker {
+        padding: 12px 20px;
+        height: 50px;
+      }
+      
+      .progress-circle {
+        width: 28px;
+        height: 28px;
+        font-size: 10px;
+      }
+      
+      .progress-label {
+        font-size: 10px;
+      }
+      
+      .slide-navigation {
+        flex-direction: column;
+        gap: 12px;
+      }
+      
+      .slide-navigation > * {
+        width: 100%;
+      }
+      
+      .btn-primary,
+      .btn-secondary {
+        width: 100%;
+        justify-content: center;
+      }
+      
+      .header-content {
+        padding: 0 20px;
+      }
+    }
+
+    /* Story image sizing and responsive behaviour */
+    .story-wrap { width:320px; height:200px; overflow:hidden; border-radius:12px; }
+    .story-photo { display:block; width:100%; height:100%; object-fit:cover; filter:brightness(0.98) saturate(1.03) contrast(1.02); transition:transform .25s ease; }
+    .story-photo:hover { transform: scale(1.02); }
+
+    @media (max-width: 768px) {
+      .story-wrap { width:220px; height:150px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <div class="header-content">
+      <div>
+        <h1>🏥 SmartHealth</h1>
+        <p>AI Health Assistant</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- Progress Tracker (Shown only on screens 2-4) -->
+  <div class="progress-tracker" id="progressTracker">
+    <div class="progress-step active" data-step="1">
+      <div class="progress-circle">1</div>
+      <div class="progress-label">Symptoms</div>
+    </div>
+    <div class="progress-step" data-step="2">
+      <div class="progress-circle">2</div>
+      <div class="progress-label">Duration</div>
+    </div>
+    <div class="progress-step" data-step="3">
+      <div class="progress-circle">3</div>
+      <div class="progress-label">Severity</div>
+    </div>
+    <div class="progress-step" data-step="4">
+      <div class="progress-circle">✓</div>
+      <div class="progress-label">Results</div>
+    </div>
+  </div>
+
+  <!-- Main Container -->
+  <div class="container">
+    
+    <!-- SCREEN 1: Welcome & Symptom Input (Apollo-style Hero) -->
+    <div class="screen active" id="screen-1">
+      <div class="screen-content" style="justify-content: flex-start; padding-top: 30px;">
+        <div class="hero" style="max-width: 1200px; width: 100%; margin: 0 auto;">
+          <!-- Left Side: Storytelling Illustration (rural healthcare challenges) -->
+          <div style="display:flex; align-items:center; gap:20px;">
+            <div style="flex:1;">
+              <h2 style="color:var(--primary-dark); font-size:34px; font-weight:800; margin-bottom:12px;">Healthcare access is limited. SmartHealth bridges the gap.</h2>
+              <p style="color:var(--gray); font-size:16px; line-height:1.6; margin-bottom:18px;">In many rural areas hospitals are far, awareness is low and digital records are missing. SmartHealth connects people to guidance, local clinics, and helps maintain health records — all through a friendly AI assistant.</p>
+              <ul style="color:var(--gray); margin-left:18px; margin-top:12px;">
+                <li style="margin-bottom:8px;">📍 Distant hospitals and long travel times</li>
+                <li style="margin-bottom:8px;">💬 Lack of awareness on early warning signs</li>
+                <li style="margin-bottom:8px;">🗂 No centralized digital health records</li>
+              </ul>
+            </div>
+            <div class="story-col" style="flex-shrink:0; display:flex; align-items:center; justify-content:center;">
+              <!-- Photorealistic storytelling image: optimized responsive variants -->
+              <div class="story-wrap" style="border-radius:12px; overflow:hidden; box-shadow:var(--shadow-md); width:320px; height:200px;">
+                <img src="assets/realistic-village-320.jpg" srcset="assets/realistic-village-320.jpg 320w, assets/realistic-village-640.jpg 640w, assets/realistic-village.jpg 1200w" sizes="(max-width:768px) 40vw, 320px" alt="Rural father caring for unwell child with distant hospital in background" class="story-photo"/>
+                <!-- Optimized copies created: realistic-village-320.jpg and realistic-village-640.jpg -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Side: AI Assistant Interface -->
+          <div style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
+            <div class="screen-card" style="max-width:420px; width:100%; text-align:left;">
+              <div style="display:flex; gap:12px; align-items:center;">
+                <div style="width:72px; height:72px; border-radius:14px; background:linear-gradient(135deg,var(--primary),var(--primary-dark)); display:flex; align-items:center; justify-content:center; color:white; font-size:36px;">👩‍⚕️</div>
+                <div>
+                  <h3 style="margin:0; font-size:20px; color:var(--primary-dark);">Your AI Health Assistant</h3>
+                  <p style="margin:4px 0 0 0; color:var(--gray); font-size:13px;">Quick, friendly medical guidance</p>
+                </div>
+              </div>
+
+              <div style="margin-top:16px;">
+                <label style="font-weight:700; color:var(--primary-dark); display:block; margin-bottom:8px;">What health issue are you facing?</label>
+                <textarea id="screen1Input" placeholder="E.g., fever, headache, body pain, cold..." style="width:100%; min-height:84px; padding:12px 14px; border-radius:10px; border:2px solid var(--gray-light);"></textarea>
+              </div>
+
+              <div style="margin-top:12px;">
+                <div class="symptom-chips">
+                  <button class="symptom-chip" onclick="selectSymptomQuick(this, 'fever')">🌡️ Fever</button>
+                  <button class="symptom-chip" onclick="selectSymptomQuick(this, 'cold')">❄️ Cold</button>
+                  <button class="symptom-chip" onclick="selectSymptomQuick(this, 'cough')">🫁 Cough</button>
+                  <button class="symptom-chip" onclick="selectSymptomQuick(this, 'headache')">🤕 Headache</button>
+                  <button class="symptom-chip" onclick="selectSymptomQuick(this, 'body pain')">💪 Body Pain</button>
+                  <button class="symptom-chip" onclick="selectSymptomQuick(this, 'weakness')">😴 Weakness</button>
+                </div>
+              </div>
+
+              <div style="display:flex; justify-content:flex-end; margin-top:18px;">
+                <button class="btn-primary" onclick="validateAndGoToScreen(2)" style="padding:12px 20px; font-size:15px;">Start AI Health Check</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Trust Footer at bottom -->
+        <div class="trust-footer" style="width: 100%; max-width: 1200px; margin: 60px auto 0 auto;">
+          <strong>🔒 Your Privacy Matters</strong> All health information is encrypted and stored securely. We never share your data with third parties.
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN 2: Duration Selection -->
+    <div class="screen" id="screen-2">
+      <div class="screen-content">
+        <div class="screen-card" style="max-width: 800px;">
+          <h2 class="screen-title">⏱ How long have you been experiencing this?</h2>
+          <p class="screen-subtitle">This helps us better understand your condition</p>
+          
+          <div class="quick-select" style="margin: 40px 0;">
+            <button class="quick-btn" onclick="setDurationScreen(this, 'today')" style="display: flex; align-items: center; gap: 20px; padding: 20px; border: 2px solid var(--gray-light); background: white; border-radius: 14px; cursor: pointer; font-weight: 600; text-align: left; transition: all 0.2s ease; color: var(--primary-dark);">
+              <span style="font-size: 32px; min-width: 40px;">📅</span>
+              <div>
+                <strong style="display: block; font-size: 16px; margin-bottom: 4px;">Started Today</strong>
+                <span style="font-size: 13px; color: var(--gray);">Within the last 24 hours</span>
+              </div>
+            </button>
+            <button class="quick-btn" onclick="setDurationScreen(this, '1-2-days')" style="display: flex; align-items: center; gap: 20px; padding: 20px; border: 2px solid var(--gray-light); background: white; border-radius: 14px; cursor: pointer; font-weight: 600; text-align: left; transition: all 0.2s ease; color: var(--primary-dark);">
+              <span style="font-size: 32px; min-width: 40px;">📊</span>
+              <div>
+                <strong style="display: block; font-size: 16px; margin-bottom: 4px;">1–2 Days</strong>
+                <span style="font-size: 13px; color: var(--gray);">Ongoing for a couple of days</span>
+              </div>
+            </button>
+            <button class="quick-btn" onclick="setDurationScreen(this, '3-7-days')" style="display: flex; align-items: center; gap: 20px; padding: 20px; border: 2px solid var(--gray-light); background: white; border-radius: 14px; cursor: pointer; font-weight: 600; text-align: left; transition: all 0.2s ease; color: var(--primary-dark);">
+              <span style="font-size: 32px; min-width: 40px;">📈</span>
+              <div>
+                <strong style="display: block; font-size: 16px; margin-bottom: 4px;">3–7 Days</strong>
+                <span style="font-size: 13px; color: var(--gray);">Up to a week</span>
+              </div>
+            </button>
+            <button class="quick-btn" onclick="setDurationScreen(this, 'more-than-week')" style="display: flex; align-items: center; gap: 20px; padding: 20px; border: 2px solid var(--gray-light); background: white; border-radius: 14px; cursor: pointer; font-weight: 600; text-align: left; transition: all 0.2s ease; color: var(--primary-dark);">
+              <span style="font-size: 32px; min-width: 40px;">📆</span>
+              <div>
+                <strong style="display: block; font-size: 16px; margin-bottom: 4px;">More Than a Week</strong>
+                <span style="font-size: 13px; color: var(--gray);">Ongoing longer</span>
+              </div>
+            </button>
+          </div>
+          
+          <div class="button-row" style="margin-top: 40px; justify-content: center; gap: 16px;">
+            <button class="btn-secondary" onclick="goToScreen(1)" style="width: auto; padding: 14px 32px;">← Back</button>
+            <button class="btn-primary" onclick="validateAndGoToScreen(3)" style="width: auto; padding: 14px 32px;">Next → Severity</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN 3: Severity Selection -->
+    <div class="screen" id="screen-3">
+      <div class="screen-content">
+        <div class="screen-card" style="max-width: 800px;">
+          <h2 class="screen-title">🔍 How severe is your condition?</h2>
+          <p class="screen-subtitle">Help us understand the urgency</p>
+          
+          <div class="quick-select" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; margin: 40px 0;">
+            <button class="quick-btn" id="severity-low" onclick="setSeverityScreen('low')" style="padding: 30px 20px; border: 2px solid var(--gray-light); background: white; border-radius: 14px; cursor: pointer; font-weight: 600; transition: all 0.2s ease; text-align: center; color: var(--primary-dark); display: flex; flex-direction: column; align-items: center; gap: 12px;">
+              <div style="font-size: 50px;">🟢</div>
+              <strong style="display: block; font-size: 16px;">Low</strong>
+              <div style="font-size: 13px; color: var(--gray);">Mild symptoms</div>
+            </button>
+            <button class="quick-btn" id="severity-medium" onclick="setSeverityScreen('medium')" style="padding: 30px 20px; border: 2px solid var(--gray-light); background: white; border-radius: 14px; cursor: pointer; font-weight: 600; transition: all 0.2s ease; text-align: center; color: var(--primary-dark); display: flex; flex-direction: column; align-items: center; gap: 12px;">
+              <div style="font-size: 50px;">🟡</div>
+              <strong style="display: block; font-size: 16px;">Medium</strong>
+              <div style="font-size: 13px; color: var(--gray);">Moderate symptoms</div>
+            </button>
+            <button class="quick-btn" id="severity-high" onclick="setSeverityScreen('high')" style="padding: 30px 20px; border: 2px solid var(--gray-light); background: white; border-radius: 14px; cursor: pointer; font-weight: 600; transition: all 0.2s ease; text-align: center; color: var(--primary-dark); display: flex; flex-direction: column; align-items: center; gap: 12px;">
+              <div style="font-size: 50px;">🔴</div>
+              <strong style="display: block; font-size: 16px;">High</strong>
+              <div style="font-size: 13px; color: var(--gray);">Severe symptoms</div>
+            </button>
+          </div>
+          
+          <div class="button-row" style="margin-top: 40px; justify-content: center; gap: 16px;">
+            <button class="btn-secondary" onclick="goToScreen(2)" style="width: auto; padding: 14px 32px;">← Back</button>
+            <button class="btn-primary" onclick="analyzeAndShowResults()" style="width: auto; padding: 14px 40px;">Analyze Symptoms</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN 4: Results & Recommendations -->
+    <div class="screen" id="screen-4">
+      <div class="screen-content" style="padding: 60px 40px 40px 40px; justify-content: flex-start; overflow-y: auto;">
+        <div class="screen-card" style="text-align: left; max-width: 1000px; padding: 28px;">
+          <h2 class="screen-title" style="text-align: center; margin-bottom: 18px;">📊 Results & Next Steps</h2>
+
+          <div style="display:grid; grid-template-columns: repeat(auto-fit,minmax(240px,1fr)); gap:18px;">
+            <!-- Card 1: AI Symptom Analysis -->
+            <div class="result-card" style="min-height:160px; display:flex; flex-direction:column; justify-content:flex-start;">
+              <h3>AI Symptom Analysis</h3>
+              <div style="flex:1;">
+                <div style="margin-bottom:10px;" id="resultSummaryContainer">
+                  <p id="resultSummary" style="color: var(--gray); margin: 0; line-height: 1.6; font-size: 14px;"></p>
+                </div>
+                <div>
+                  <h4 style="margin:8px 0 6px 0; font-size:14px; color:var(--primary-dark);">Possible Conditions</h4>
+                  <div id="resultConditions" style="max-height:120px; overflow:auto;"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 2: Immediate Care Suggestions -->
+            <div class="result-card" style="min-height:160px; display:flex; flex-direction:column;">
+              <h3>Immediate Care Suggestions</h3>
+              <div style="flex:1; overflow:auto;">
+                <ul id="resultRecommendations" style="list-style:none; padding-left:0; margin:0; display:flex; flex-direction:column; gap:8px;"></ul>
+              </div>
+            </div>
+
+            <!-- Card 3: Find Nearby Clinics -->
+            <div class="result-card" style="min-height:160px; display:flex; flex-direction:column; align-items:flex-start; gap:12px;">
+              <h3>Find Nearby Clinics</h3>
+              <p style="color:var(--gray); margin:0;">Locate clinics and hospitals near you.</p>
+              <div style="margin-top:auto; width:100%; display:flex; gap:8px;">
+                <button class="btn-primary" style="flex:1; padding:10px;" onclick="openHospitalSearchPanel()">Search Clinics</button>
+                <button class="btn-secondary" style="flex:1; padding:10px;" onclick="searchHospitalsByGPS()">Use My Location</button>
+              </div>
+            </div>
+
+            <!-- Card 4: Access Digital Health Records -->
+            <div class="result-card" style="min-height:160px; display:flex; flex-direction:column; align-items:flex-start; gap:12px;">
+              <h3>Access Digital Health Records</h3>
+              <p style="color:var(--gray); margin:0;">Securely view and share your saved records.</p>
+              <div style="margin-top:auto; width:100%; display:flex; gap:8px;">
+                <button class="btn-primary" style="flex:1; padding:10px;" onclick="openDigitalRecords()">Access Records</button>
+                <button class="btn-secondary" style="flex:1; padding:10px;" onclick="downloadHealthSummary()">Download Summary</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Medical Disclaimer -->
+          <div style="background: rgba(231, 76, 60, 0.06); padding: 14px; border-radius: 12px; margin-top: 18px; border-left: 4px solid #e74c3c;">
+            <strong style="color: #c0392b; font-size: 14px; display: block; margin-bottom: 6px;">⚠️ Medical Disclaimer</strong>
+            <p style="color: var(--gray); font-size: 13px; margin: 0; line-height: 1.5;">This AI-generated analysis is for informational purposes only and is not a medical diagnosis. Seek professional medical advice for persistent or worsening symptoms.</p>
+          </div>
+
+          <!-- Footer actions -->
+          <div style="display:flex; gap:10px; margin-top:18px;">
+            <button class="btn-secondary" onclick="goToScreen(1)" style="padding:10px 14px;">🔄 Start Over</button>
+            <button class="btn-primary" onclick="openConsultModal()" style="padding:10px 14px;">👨‍⚕️ Request Consultation</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Hospital Search Panel -->
+  <div id="hospitalSearchPanel" style="display: none; position: fixed; inset: 0; background: white; z-index: 1000; overflow-y: auto;">
+    <div style="max-width: 1200px; margin: 0 auto; padding: 40px 40px;">
+      <!-- Header -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+        <h1 style="color: var(--primary-dark); font-size: 32px; font-weight: 800; margin: 0;">🏥 Find Hospitals & Clinics</h1>
+        <button onclick="closeHospitalSearchPanel()" style="background: none; border: none; font-size: 28px; cursor: pointer; color: var(--gray); padding: 0; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">✕</button>
+      </div>
+
+      <!-- Patient Details Summary -->
+      <div style="background: rgba(91, 124, 236, 0.08); padding: 20px; border-radius: 14px; margin-bottom: 30px; border-left: 4px solid var(--primary);">
+        <h3 style="color: var(--primary-dark); margin-top: 0;">Your Health Details</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px;">
+          <div>
+            <strong style="color: var(--gray); font-size: 12px;">SYMPTOMS</strong>
+            <p id="summarySymptoms" style="color: var(--primary-dark); margin: 8px 0 0 0; font-weight: 600;"></p>
+          </div>
+          <div>
+            <strong style="color: var(--gray); font-size: 12px;">DURATION</strong>
+            <p id="summaryDuration" style="color: var(--primary-dark); margin: 8px 0 0 0; font-weight: 600;"></p>
+          </div>
+          <div>
+            <strong style="color: var(--gray); font-size: 12px;">SEVERITY</strong>
+            <p id="summarySeverity" style="color: var(--primary-dark); margin: 8px 0 0 0; font-weight: 600;"></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Search Options -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-bottom: 30px;">
+        <div style="padding: 15px; border: 2px solid var(--gray-light); border-radius: 12px;">
+          <h4 style="color: var(--primary-dark); margin-bottom: 10px;">📍 Search by Address</h4>
+          <div style="display: flex; gap: 8px;">
+            <input id="addressInput" type="text" placeholder="Enter address or city" style="flex: 1; padding: 10px; border: 1px solid var(--gray-light); border-radius: 8px; font-size: 14px;">
+            <button class="btn-primary" onclick="searchHospitalsByAddress()" style="padding: 10px 16px; white-space: nowrap;">Search</button>
+          </div>
+        </div>
+
+        <div style="padding: 15px; border: 2px solid var(--gray-light); border-radius: 12px;">
+          <h4 style="color: var(--primary-dark); margin-bottom: 10px;">📌 Current Location</h4>
+          <button class="btn-primary" onclick="searchHospitalsByGPS()" style="width: 100%; padding: 10px;">Use My GPS Location</button>
+        </div>
+
+        <div style="padding: 15px; border: 2px solid var(--gray-light); border-radius: 12px;">
+          <h4 style="color: var(--primary-dark); margin-bottom: 10px;">🗺️ Popular Cities</h4>
+          <select id="citySelect" onchange="searchHospitalsByCity()" style="width: 100%; padding: 10px; border: 1px solid var(--gray-light); border-radius: 8px; font-size: 14px;">
+            <option value="">Select a city...</option>
+            <option value="bangalore">Bangalore</option>
+            <option value="mumbai">Mumbai</option>
+            <option value="delhi">Delhi</option>
+            <option value="hyderabad">Hyderabad</option>
+            <option value="chennai">Chennai</option>
+            <option value="pune">Pune</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Status Message -->
+      <div id="hospitalStatus" style="font-size: 14px; color: var(--primary-dark); margin: 20px 0; padding: 12px; background: rgba(56, 182, 168, 0.1); border-radius: 8px; border-left: 4px solid var(--success); display: none;"></div>
+
+      <!-- Results -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+        <div>
+          <h3 style="color: var(--primary-dark); margin-bottom: 15px;">Nearby Hospitals & Clinics (<span id="hospitalCount">0</span>)</h3>
+          <ul id="hospitalsList" style="list-style: none; padding: 0; margin: 0;"></ul>
+        </div>
+        <div>
+          <h3 style="color: var(--primary-dark); margin-bottom: 15px;">Map View</h3>
+          <div id="mapContainer" style="width: 100%; height: 500px; background: #f0f0f0; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--gray);">
+            <p>Map will appear here</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Back Button -->
+      <div style="margin-top: 30px; text-align: center;">
+        <button class="btn-secondary" onclick="closeHospitalSearchPanel()" style="padding: 12px 30px;">← Back to Results</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Consultation Modal -->
+  <div id="consultModal" class="modal" role="dialog" aria-hidden="true">
+    <div class="modal-card">
+      <h3>Request Doctor Consultation</h3>
+      <p>A healthcare professional will review your case and get back to you shortly.</p>
+      <input id="consultName" type="text" placeholder="Full name">
+      <input id="consultEmail" type="email" placeholder="Email">
+      <input id="consultPhone" type="text" placeholder="Phone (optional)">
+      <div class="modal-buttons">
+        <button class="btn-secondary" onclick="closeConsultModal()">Cancel</button>
+        <button class="btn-primary" id="consultSubmitBtn" onclick="submitConsultRequest()">Request Consult</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Consultation Modal -->
+  <div id="consultModal" class="modal" role="dialog" aria-hidden="true">
+    <div class="modal-card">
+      <h3>Request Doctor Consultation</h3>
+      <p>Provide your contact details. A clinician will review your case.</p>
+      <input id="consultName" type="text" placeholder="Full name">
+      <input id="consultEmail" type="email" placeholder="Email">
+      <input id="consultPhone" type="text" placeholder="Phone (optional)">
+      <div class="modal-buttons">
+        <button class="btn-secondary" onclick="closeConsultModal()">Cancel</button>
+        <button class="btn-primary" id="consultSubmitBtn" onclick="submitConsultRequest()">Request Consult</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Global State Management
+    const state = {
+      symptoms: '',
+      duration: null,
+      severity: null,
+      currentScreen: 1
+    };
+
+let userSelectedSeverity = null;
+let lastAiSummaryForConsult = null;
+
+// Local Symptom Database
+const symptomDatabase = {
+  fever: {
+    severity: 'yellow',
+    conditions: [
+      { name: 'Common Cold', probability: 45 },
+      { name: 'Flu (Influenza)', probability: 40 },
+      { name: 'Viral Infection', probability: 35 },
+      { name: 'Bacterial Infection', probability: 20 }
+    ],
+    recommendations: [
+      'Rest and get adequate sleep',
+      'Drink plenty of fluids (water, herbal tea, warm soup)',
+      'Use fever-reducing medications like paracetamol or ibuprofen',
+      'Maintain body temperature with light clothing',
+      'Consult doctor if fever persists beyond 3 days or exceeds 103°F'
+    ]
+  },
+  cold: {
+    severity: 'green',
+    conditions: [
+      { name: 'Common Cold', probability: 85 },
+      { name: 'Seasonal Allergies', probability: 15 },
+      { name: 'Early Flu', probability: 10 }
+    ],
+    recommendations: [
+      'Stay hydrated with warm fluids',
+      'Use saline nasal drops or spray',
+      'Get plenty of rest',
+      'Gargle with warm salt water',
+      'Vitamin C supplements may help reduce duration'
+    ]
+  },
+  cough: {
+    severity: 'yellow',
+    conditions: [
+      { name: 'Common Cold', probability: 40 },
+      { name: 'Bronchitis', probability: 35 },
+      { name: 'Asthma', probability: 20 },
+      { name: 'Pneumonia', probability: 15 }
+    ],
+    recommendations: [
+      'Stay hydrated and drink warm fluids',
+      'Use honey and lemon in warm water',
+      'Avoid irritants like smoke and pollution',
+      'Use cough drops or lozenges',
+      'Seek medical attention if cough persists for more than 2 weeks'
+    ]
+  },
+  vomit: {
+    severity: 'yellow',
+    conditions: [
+      { name: 'Gastroenteritis (Food Poisoning)', probability: 50 },
+      { name: 'Nausea/Indigestion', probability: 30 },
+      { name: 'Migraine', probability: 15 },
+      { name: 'Stomach Ulcer', probability: 10 }
+    ],
+    recommendations: [
+      'Avoid food for first few hours',
+      'Sip small amounts of clear fluids (water, ginger ale)',
+      'Once stable, eat bland foods like crackers or toast',
+      'Avoid dairy and fatty foods',
+      'Seek immediate care if vomiting persists or accompanied by severe abdominal pain'
+    ]
+  },
+  diabetes: {
+    severity: 'red',
+    conditions: [
+      { name: 'Type 2 Diabetes', probability: 60 },
+      { name: 'Type 1 Diabetes', probability: 25 },
+      { name: 'Prediabetes', probability: 15 }
+    ],
+    recommendations: [
+      'Consult an endocrinologist immediately',
+      'Monitor blood sugar levels regularly',
+      'Maintain a healthy diet low in refined sugars',
+      'Exercise regularly (150 minutes per week)',
+      'Take prescribed medications consistently',
+      'Check feet daily for any sores or infections'
+    ]
+  },
+  bp: {
+    severity: 'red',
+    conditions: [
+      { name: 'Hypertension (High Blood Pressure)', probability: 70 },
+      { name: 'Hypotension (Low Blood Pressure)', probability: 20 },
+      { name: 'White Coat Syndrome', probability: 10 }
+    ],
+    recommendations: [
+      'See a cardiologist for proper diagnosis',
+      'Monitor blood pressure daily at home',
+      'Reduce sodium intake',
+      'Exercise regularly and manage weight',
+      'Manage stress through meditation or yoga',
+      'Avoid alcohol and smoking',
+      'Take antihypertensive medications as prescribed'
+    ]
+  },
+  headache: {
+    severity: 'yellow',
+    conditions: [
+      { name: 'Tension Headache', probability: 55 },
+      { name: 'Migraine', probability: 25 },
+      { name: 'Dehydration', probability: 15 },
+      { name: 'Sinusitis', probability: 10 }
+    ],
+    recommendations: [
+      'Rest in a quiet, dark room',
+      'Apply hot or cold compress to head or neck',
+      'Stay hydrated by drinking water',
+      'Take over-the-counter pain relievers (ibuprofen, acetaminophen)',
+      'Practice relaxation techniques',
+      'Seek medical attention if headache is severe or accompanied by vision changes'
+    ]
+  },
+  'body pain': {
+    severity: 'yellow',
+    conditions: [
+      { name: 'Muscle Strain', probability: 40 },
+      { name: 'Viral Infection', probability: 30 },
+      { name: 'Arthritis', probability: 20 },
+      { name: 'Fibromyalgia', probability: 10 }
+    ],
+    recommendations: [
+      'Rest the affected areas',
+      'Apply ice packs for first 48 hours, then heat',
+      'Take anti-inflammatory medications',
+      'Gentle stretching and light movement',
+      'Massage or physical therapy may help',
+      'Ensure adequate sleep and hydration'
+    ]
+  },
+  weakness: {
+    severity: 'yellow',
+    conditions: [
+      { name: 'Fatigue/Lack of Sleep', probability: 45 },
+      { name: 'Anemia', probability: 25 },
+      { name: 'Thyroid Disorder', probability: 20 },
+      { name: 'Nutritional Deficiency', probability: 15 }
+    ],
+    recommendations: [
+      'Get 7-9 hours of sleep nightly',
+      'Eat a balanced diet rich in iron and B vitamins',
+      'Stay hydrated throughout the day',
+      'Exercise regularly to build strength',
+      'Consult a doctor for blood tests if weakness persists',
+      'Manage stress and avoid overexertion'
+    ]
+  }
+};
+
+let userDuration = null;
+
+// Symptom Chip Handler
+function addSymptom(element, symptom) {
+  const textarea = document.getElementById('symptomInput');
+  const currentValue = textarea.value.trim();
+  
+  // Toggle selection
+  element.classList.toggle('selected');
+  
+  // Add or remove symptom from textarea
+  if (element.classList.contains('selected')) {
+    if (currentValue) {
+      textarea.value = currentValue + ', ' + symptom;
+    } else {
+      textarea.value = symptom;
+    }
+  } else {
+    const symptoms = currentValue.split(',').map(s => s.trim()).filter(s => s !== symptom);
+    textarea.value = symptoms.join(', ');
+  }
+  
+  // Update character counter
+  updateCharCounter();
+  textarea.focus();
+}
+
+// Character Counter
+function updateCharCounter() {
+  const textarea = document.getElementById('symptomInput');
+  const counter = document.getElementById('charCount');
+  if (counter) {
+    counter.textContent = textarea.value.length;
+  }
+}
+
+// Update Progress Tracker
+function updateProgressTracker(step) {
+  document.querySelectorAll('.progress-step').forEach((el, idx) => {
+    if (idx < step) {
+      el.classList.add('active');
+    } else {
+      el.classList.remove('active');
+    }
+  });
+}
+
+// Slide Navigation Functions
+function goToSlide(slideNum) {
+  const input = document.getElementById('symptomInput').value.trim();
+  
+  if (slideNum === 2 && !input) {
+    showAlert('Please describe your symptoms');
+    return;
+  }
+  
+  if (slideNum === 4 && !userSelectedSeverity) {
+    showAlert('Please select a severity level');
+    return;
+  }
+  
+  // Hide all slides
+  document.querySelectorAll('.slide').forEach(slide => slide.classList.remove('active'));
+  
+  // Show target slide
+  const targetSlide = document.getElementById(`slide-${slideNum}`);
+  if (targetSlide) {
+    targetSlide.classList.add('active');
+    updateProgressTracker(slideNum);
+    
+    // If going to results slide, analyze symptoms
+    if (slideNum === 4) {
+      analyzeSymptoms();
+    }
+  }
+  
+  // Scroll to top
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function setSeverity(severity) {
+  userSelectedSeverity = severity;
+  
+  // Update quick button styling
+  document.querySelectorAll('.quick-btn').forEach(btn => btn.classList.remove('selected'));
+  event.target.closest('.quick-btn').classList.add('selected');
+  
+  // Update display
+  const labels = { low: '🟢 Low', medium: '🟡 Medium', high: '🔴 High' };
+  document.getElementById('selectedSeverityDisplay').textContent = labels[severity] || 'Not selected';
+}
+
+function setDuration(duration) {
+  userDuration = duration;
+  document.querySelectorAll('.quick-btn').forEach(btn => btn.classList.remove('selected'));
+  event.target.closest('.quick-btn').classList.add('selected');
+}
+
+function showAlert(msg) {
+  alert(msg);
+}
+
+async function callAiAnalyze(text, severity) {
+  const res = await fetch('/api/analyze-symptoms', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text, severity })
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ error: 'unknown' }));
+    throw new Error(err?.error || 'AI request failed');
+  }
+  return await res.json();
+}
+
+async function analyzeSymptoms() {
+  const inputEl = document.getElementById('symptomInput');
+  const input = inputEl.value.trim();
+  if (!input) { showAlert('Please describe your symptoms'); return; }
+  if (!userSelectedSeverity) { showAlert('Please select a severity level'); return; }
+
+  try {
+    const ai = await callAiAnalyze(input, userSelectedSeverity);
+    displayResultsFromAi(ai, input);
+  } catch (err) {
+    console.error(err);
+    // Try local database fallback
+    const localResult = findLocalMatch(input);
+    if (localResult) {
+      displayResultsLocal(localResult, input);
+      console.log('Using local symptom database (AI service unavailable)');
+    } else {
+      showAlert('Could not analyze symptoms. Try mentioning: fever, cold, cough, vomit, diabetes, bp, headache, weakness, or body pain.');
+    }
+  }
+}
+
+function findLocalMatch(input) {
+  const lowerInput = input.toLowerCase();
+  for (let symptom in symptomDatabase) {
+    if (lowerInput.includes(symptom)) {
+      return { symptom, data: symptomDatabase[symptom] };
+    }
+  }
+  return null;
+}
+
+function displayResultsLocal(match, userInput) {
+  const { symptom, data } = match;
+  const adjustedSeverity = adjustSeverityLevel(data.severity, userSelectedSeverity);
+  const adjustedConditions = adjustConditions(data.conditions, userSelectedSeverity);
+  const adjustedRecommendations = adjustRecommendations(data.recommendations, userSelectedSeverity);
+
+  document.getElementById('resultSymptom').textContent = userInput;
+  const severityBadge = document.getElementById('severityBadge');
+  severityBadge.className = `severity-badge severity-${adjustedSeverity}`;
+  severityBadge.textContent = getSeverityLabel(adjustedSeverity);
+
+  const conditionsList = document.getElementById('conditionsList');
+  conditionsList.innerHTML = adjustedConditions.map(c => {
+    const prob = Math.min(100, Math.max(0, Math.round(Number(c.probability) || 0)));
+    return `
+      <div class="condition-item">
+        <span class="condition-name">${c.name}</span>
+        <div class="probability">
+          <div class="probability-bar">
+            <div class="probability-fill" style="width: ${prob}%"></div>
+          </div>
+          <span class="probability-text">${prob}%</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  const recommendationsList = document.getElementById('recommendationsList');
+  recommendationsList.innerHTML = adjustedRecommendations.map(r => `<li>${r}</li>`).join('');
+
+  lastAiSummaryForConsult = `Symptoms: ${userInput}\nTop Conditions: ${adjustedConditions.slice(0,3).map(x => x.name + ' (' + x.probability + '%)').join(', ')}\nRecommendations: ${adjustedRecommendations.slice(0,3).join('; ')}`;
+
+  // Show consult button
+  document.getElementById('consultButton2').style.display = 'block';
+}
+
+function displayResultsFromAi(ai, userInput) {
+  const severityBadge = document.getElementById('severityBadge');
+  const finalSeverity = ai.severity || 'yellow';
+  const conditions = Array.isArray(ai.conditions) ? ai.conditions : [];
+  const recommendations = Array.isArray(ai.recommendations) ? ai.recommendations : [];
+  const summary = ai.summary || '';
+
+  document.getElementById('resultSymptom').textContent = userInput;
+  severityBadge.className = `severity-badge severity-${finalSeverity}`;
+  severityBadge.textContent = { green: 'Low', yellow: 'Moderate', red: 'High' }[finalSeverity] || 'Unknown';
+
+  const conditionsList = document.getElementById('conditionsList');
+  conditionsList.innerHTML = conditions.map(c => {
+    const prob = Math.min(100, Math.max(0, Math.round(Number(c.probability) || 0)));
+    return `
+      <div class="condition-item">
+        <span class="condition-name">${c.name}</span>
+        <div class="probability">
+          <div class="probability-bar">
+            <div class="probability-fill" style="width: ${prob}%"></div>
+          </div>
+          <span class="probability-text">${prob}%</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  const recommendationsList = document.getElementById('recommendationsList');
+  recommendationsList.innerHTML = recommendations.map(r => `<li>${r}</li>`).join('');
+
+  lastAiSummaryForConsult = summary || `Symptoms: ${userInput}`;
+
+  // Show consult button
+  document.getElementById('consultButton2').style.display = 'block';
+}
+
+function openConsultModal() {
+  document.getElementById('consultModal').classList.add('show');
+  document.getElementById('consultModal').setAttribute('aria-hidden', 'false');
+}
+
+function closeConsultModal() {
+  document.getElementById('consultModal').classList.remove('show');
+  document.getElementById('consultModal').setAttribute('aria-hidden', 'true');
+}
+
+async function submitConsultRequest() {
+  const name = document.getElementById('consultName').value.trim();
+  const email = document.getElementById('consultEmail').value.trim();
+  const phone = document.getElementById('consultPhone').value.trim();
+
+  if (!name || !email) { showAlert('Please provide name and email'); return; }
+
+  const submitBtn = document.getElementById('consultSubmitBtn');
+  const original = submitBtn.innerText;
+  submitBtn.disabled = true;
+  submitBtn.innerText = 'Sending...';
+
+  try {
+    const res = await fetch('/api/request-consult', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, phone, summary: lastAiSummaryForConsult || 'No summary' })
+    });
+    if (!res.ok) throw new Error('Failed');
+    const data = await res.json();
+    showAlert('Consult request submitted! Reference: ' + (data.requestId || 'N/A'));
+    closeConsultModal();
+  } catch (err) {
+    showAlert('Failed to submit. Try again later.');
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.innerText = original;
+  }
+}
+
+// Helper functions for severity and recommendations adjustment
+function adjustSeverityLevel(baseSeverity, userSeverity) {
+  const severityMap = { green: 0, yellow: 1, red: 2 };
+  const severityLevels = ['green', 'yellow', 'red'];
+  const baseLevel = severityMap[baseSeverity] ?? 1;
+  const userLevel = { low: 0, medium: 1, high: 2 }[userSeverity] ?? 1;
+  const adjustedLevel = Math.round((baseLevel + userLevel) / 2);
+  return severityLevels[Math.min(2, Math.max(0, adjustedLevel))];
+}
+
+function adjustConditions(conditions, userSeverity) {
+  const severityMultipliers = { low: 0.7, medium: 1.0, high: 1.3 };
+  const multiplier = severityMultipliers[userSeverity] ?? 1.0;
+  return conditions
+    .map(condition => ({
+      ...condition,
+      probability: Math.min(100, Math.round(condition.probability * multiplier))
+    }))
+    .sort((a, b) => b.probability - a.probability);
+}
+
+function adjustRecommendations(recommendations, userSeverity) {
+  if (userSeverity === 'high') {
+    return [
+      '⚠️ Seek immediate medical attention or call emergency services',
+      '⚠️ Contact your doctor or visit urgent care immediately',
+      ...recommendations.slice(0, 2)
+    ];
+  }
+  if (userSeverity === 'low') {
+    return [
+      'Monitor your symptoms closely',
+      'Rest and stay hydrated',
+      ...recommendations.slice(0, 2)
+    ];
+  }
+  return recommendations;
+}
+
+function getSeverityLabel(severity) {
+  const labels = { green: 'Low', yellow: 'Moderate', red: 'High' };
+  return labels[severity] || 'Unknown';
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  const input = document.getElementById('symptomInput');
+  
+  // Character counter listener
+  input.addEventListener('input', updateCharCounter);
+  
+  // Keyboard shortcut (Ctrl+Enter) to analyze
+  input.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter' && e.ctrlKey) {
+      analyzeSymptoms();
+    }
+  });
+  
+  // Initialize progress tracker
+  updateProgressTracker(1);
+});
+  </script>
+  <script src="script.js"></script>
+  <script>
+    // ============================================
+    // HOSPITAL DATA CONFIGURATION & GENERATION
+    // ============================================
+    
+    // Hospital name prefixes for generating random names
+    const hospitalNamePrefixes = [
+      'Apollo', 'Fortis', 'Max', 'Columbia', 'Narayana', 'Manipal', 'Indraprastha', 'Care', 'United', 'Prime',
+      'City', 'Healing', 'Royal', 'Star', 'Sacred', 'Sunrise', 'Wellness', 'Life', 'Divine', 'Health',
+      'Mercy', 'Grace', 'Victory', 'Trust', 'Modern', 'Advanced', 'Global', 'National', 'Federal', 'Bright'
+    ];
+    
+    const hospitalNameSuffixes = [
+      'Hospital', 'Clinic', 'Healthcare', 'Medical Center', 'Care Center', 'Nursing Home', 'Diagnostic Center',
+      'Health Institute', 'Medical Institute', 'Medical Complex', 'Medical Services', 'Wellness Center'
+    ];
+    
+    const specialities = [
+      'Multi-specialty', 'Cardiology', 'Orthopedics', 'Neurology', 'Pediatrics', 'General Practice',
+      'Oncology', 'Gastroenterology', 'ENT', 'Ophthalmology', 'Dermatology', 'Psychiatry',
+      'Pulmonology', 'Nephrology', 'Rheumatology', 'Immunology', 'Urology', 'Gynecology',
+      'Emergency Care', 'Trauma Center', 'Maternity', 'Dental', 'ICU', 'General Surgery'
+    ];
+    
+    // City locations with hospital counts and area codes
+    const cityLocations = {
+      'bangalore': { count: 5, code: '80', region: 'Bangalore' },
+      'mumbai': { count: 7, code: '22', region: 'Mumbai' },
+      'delhi': { count: 8, code: '11', region: 'Delhi' },
+      'hyderabad': { count: 6, code: '40', region: 'Hyderabad' },
+      'chennai': { count: 5, code: '44', region: 'Chennai' },
+      'pune': { count: 4, code: '20', region: 'Pune' },
+      'eluru': { count: 3, code: '83', region: 'Eluru' },
+      'kakinada': { count: 5, code: '84', region: 'Kakinada' },
+      'vizag': { count: 6, code: '89', region: 'Visakhapatnam' },
+      'visakhapatnam': { count: 6, code: '89', region: 'Visakhapatnam' },
+      'vijayawada': { count: 4, code: '86', region: 'Vijayawada' },
+      'rajahmundry': { count: 3, code: '83', region: 'Rajahmundry' },
+      'tirupati': { count: 4, code: '89', region: 'Tirupati' },
+      'gurgaon': { count: 6, code: '12', region: 'Gurgaon' },
+      'noida': { count: 5, code: '12', region: 'Noida' },
+      'jaipur': { count: 4, code: '14', region: 'Jaipur' }
+    };
+    
+    function generateRandomPhone(areaCode) {
+      const firstDigit = Math.floor(Math.random() * 8) + 2; // 2-9
+      const remaining = Array.from({length: 8}, () => Math.floor(Math.random() * 10)).join('');
+      return `+91-${areaCode}-${firstDigit}${remaining}`;
+    }
+    
+    function generateRandomHospitalName() {
+      const prefix = hospitalNamePrefixes[Math.floor(Math.random() * hospitalNamePrefixes.length)];
+      const suffix = hospitalNameSuffixes[Math.floor(Math.random() * hospitalNameSuffixes.length)];
+      return `${prefix} ${suffix}`;
+    }
+    
+    function generateRandomRating() {
+      return (3.5 + Math.random() * 1.3).toFixed(1);
+    }
+    
+    function generateHospitalsForLocation(location) {
+      const locData = cityLocations[location.toLowerCase()];
+      if (!locData) return generateDefaultHospitals(location);
+      
+      const count = locData.count;
+      const hospitals = [];
+      const usedNames = new Set();
+      
+      for (let i = 0; i < count; i++) {
+        let name;
+        do {
+          name = generateRandomHospitalName();
+        } while (usedNames.has(name));
+        usedNames.add(name);
+        
+        hospitals.push({
+          name: name,
+          address: `${locData.region}, India`,
+          rating: generateRandomRating(),
+          phone: generateRandomPhone(locData.code),
+          speciality: specialities[Math.floor(Math.random() * specialities.length)]
+        });
+      }
+      
+      return hospitals;
+    }
+    
+    function generateDefaultHospitals(location = null) {
+      const hospitals = [];
+      const usedNames = new Set();
+      const address = location ? `${location}, India` : 'Your City, India';
+      
+      for (let i = 0; i < 5; i++) {
+        let name;
+        do {
+          name = generateRandomHospitalName();
+        } while (usedNames.has(name));
+        usedNames.add(name);
+        
+        hospitals.push({
+          name: name,
+          address: address,
+          rating: generateRandomRating(),
+          phone: generateRandomPhone('80'),
+          speciality: specialities[Math.floor(Math.random() * specialities.length)]
+        });
+      }
+      
+      return hospitals;
+    }
+    
+    // ============================================
+    // UNIFIED HOSPITAL SEARCH FUNCTIONALITY
+    // ============================================
+    
+    // Open the hospital search panel
+    function openHospitalSearchPanel() {
+      // Show the address panel and by default list top hospitals in KKD
+      document.getElementById('addressPanel').style.display = 'block';
+      document.getElementById('hospitalsPanel').style.display = 'none';
+      document.getElementById('doctorsPanel').style.display = 'none';
+      // Directly show top hospitals for KKD by default
+      showTopHospitalsKKD();
+    }
+
+    // Update status message
+    function updateStatusMessage(msg) {
+      document.getElementById('statusText').textContent = msg;
+    }
+
+    // Load Google Maps script
+    async function loadGoogleMapsScript() {
+      if (window.google && window.google.maps) return; // Already loaded
+      try {
+        const keyRes = await fetch('/api/maps-key-server');
+        if (!keyRes.ok) throw new Error('Could not get maps key');
+        const keyData = await keyRes.json();
+        return new Promise((resolve, reject) => {
+          const s = document.createElement('script');
+          s.src = `https://maps.googleapis.com/maps/api/js?key=${keyData.key}`;
+          s.onload = resolve;
+          s.onerror = () => reject(new Error('Failed to load maps'));
+          document.head.appendChild(s);
+        });
+      } catch (e) {
+        console.error('Map load error:', e);
+        updateStatusMessage('⚠️ Could not load maps. Showing list view only.');
+      }
+    }
+
+    // Unified render function for all hospital results
+    async function renderHospitalResults(results, userLocation, searchType) {
+      document.getElementById('addressPanel').style.display = 'block';
+      document.getElementById('hospitalsPanel').style.display = 'none';
+      document.getElementById('doctorsPanel').style.display = 'none';
+      
+      const list = document.getElementById('addressHospitalsList');
+      const mapDiv = document.getElementById('addressMap');
+      list.innerHTML = '';
+      
+      // Update count
+      document.getElementById('hospitalCount').textContent = results.length;
+
+      // Load maps
+      try {
+        await loadGoogleMapsScript();
+      } catch (e) {
+        console.warn('Maps not available, showing list only');
+      }
+
+      // Initialize map if available
+      let map = null;
+      if (window.google && window.google.maps && userLocation) {
+        try {
+          map = new google.maps.Map(mapDiv, {
+            center: { lat: userLocation.lat, lng: userLocation.lng },
+            zoom: 13
+          });
+          
+          // Add user location marker
+          new google.maps.Marker({
+            position: { lat: userLocation.lat, lng: userLocation.lng },
+            map,
+            title: 'Your Location',
+            icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
+          });
+        } catch (e) {
+          console.error('Map initialization error:', e);
+        }
+      }
+
+      // Render hospital list
+      if (results.length === 0) {
+        list.innerHTML = '<li style="padding: 20px; text-align: center; color: #999;">No hospitals found. Try a different search.</li>';
+        updateStatusMessage('No hospitals found in this area.');
+        return;
+      }
+
+      results.forEach((r) => {
+        const li = document.createElement('li');
+        li.style.cssText = 'padding:12px; margin-bottom:8px; border-radius:6px; background:#f9f9f9; border-left:4px solid #667eea;';
+        
+        const ratingStr = r.rating ? `${r.rating}⭐ (${r.user_ratings_total || 0} reviews)` : 'No rating';
+        const address = r.vicinity || r.formatted_address || 'Address not available';
+        
+        li.innerHTML = `
+          <strong style="font-size:14px; color: #333;">${r.name}</strong>
+          <div style="font-size:12px; color:#666; margin-top:4px; line-height: 1.4;">
+            📍 ${address}
+          </div>
+          <div style="font-size:11px; color:#999; margin-top:2px;">⭐ ${ratingStr}</div>
+          <div style="margin-top:8px; display:flex; gap:6px; flex-wrap:wrap;">
+            <button class='btn-secondary' style='padding:6px 10px; font-size:11px;' onclick="showHospitalDetails('${r.place_id}')">Details</button>
+            <a class='btn-primary' href='https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(r.name)}&query_place_id=${r.place_id}' target='_blank' style='text-decoration:none; padding:6px 10px; font-size:11px; display:inline-block; border-radius:6px; color:white;'>Directions</a>
+          </div>
+        `;
+        list.appendChild(li);
+
+        // Add map marker
+        if (map && r.location) {
+          try {
+            const marker = new google.maps.Marker({
+              position: { lat: r.location.lat, lng: r.location.lng },
+              map,
+              title: r.name
+            });
+            marker.addListener('click', () => {
+              map.setCenter(marker.getPosition());
+              map.setZoom(15);
+            });
+          } catch (e) {
+            console.error('Marker error:', e);
+          }
+        }
+      });
+
+      updateStatusMessage(`✓ Found ${results.length} hospitals near you.`);
+    }
+
+    // Show hospital details
+    async function showHospitalDetails(place_id) {
+      try {
+        const res = await window.getPlaceDetails(place_id);
+        const p = res.result || res;
+        const details = `
+Name: ${p.name || 'N/A'}
+Address: ${p.formatted_address || 'N/A'}
+Phone: ${p.formatted_phone_number || 'N/A'}
+Website: ${p.website || 'N/A'}
+Rating: ${p.rating || 'N/A'}
+Status: ${p.opening_hours?.open_now ? '✓ Open Now' : 'Closed'}`;
+        alert(details);
+      } catch (e) {
+        console.error(e);
+        alert('Could not fetch hospital details. Try viewing on Google Maps.');
+      }
+    }
+
+    // SEARCH METHOD 1: By Address
+    async function searchHospitalsByAddress() {
+      const address = document.getElementById('addressInput').value.trim();
+      if (!address) {
+        updateStatusMessage('⚠️ Please enter an address');
+        return;
+      }
+      
+      const btn = document.querySelector('button[onclick="searchHospitalsByAddress()"]');
+      btn.disabled = true;
+      btn.innerText = 'Searching...';
+      updateStatusMessage('🔍 Geocoding address...');
+      
+      try {
+        const result = await window.findNearbyHospitalsFromAddress(address);
+        if (result && result.results) {
+          renderHospitalResults(result.results, result.userLocation, 'address');
+        } else {
+          updateStatusMessage('⚠️ No results returned — showing top hospitals');
+          showTopHospitalsKKD();
+        }
+      } catch (e) {
+        console.error('Search error:', e);
+        updateStatusMessage('⚠️ Address not found. Showing top hospitals instead.');
+        showTopHospitalsKKD();
+      } finally {
+        btn.disabled = false;
+        btn.innerText = 'Search';
+      }
+    }
+
+    // SEARCH METHOD 2: By Current Location
+    async function searchHospitalsByGPS() {
+      if (!navigator.geolocation) {
+        updateStatusMessage('⚠️ Geolocation not supported in your browser');
+        return;
+      }
+      
+      const btn = document.querySelector('button[onclick="searchHospitalsByGPS()"]');
+      btn.disabled = true;
+      btn.innerText = 'Locating...';
+      updateStatusMessage('📍 Getting your location...');
+      
+      navigator.geolocation.getCurrentPosition(
+        async (pos) => {
+          try {
+            const lat = pos.coords.latitude;
+            const lng = pos.coords.longitude;
+            updateStatusMessage('🔍 Finding nearby hospitals...');
+            
+            const res = await window.findNearbyHospitals(lat, lng, 5000);
+            renderHospitalResults(res.results || [], { lat, lng }, 'gps');
+          } catch (e) {
+            console.error('GPS search error:', e);
+            updateStatusMessage('⚠️ Failed to find hospitals at your location');
+          } finally {
+            btn.disabled = false;
+            btn.innerText = 'Use My Location';
+          }
+        },
+        (err) => {
+          btn.disabled = false;
+          btn.innerText = 'Use My Location';
+          updateStatusMessage('⚠️ Location permission denied');
+          console.error('Geolocation error:', err);
+        }
+      );
+    }
+
+    // SEARCH METHOD 3: By Region/City
+    async function searchHospitalsByRegion() {
+      const region = document.getElementById('regionInput').value.trim();
+      if (!region) {
+        updateStatusMessage('⚠️ Please enter a region or city name');
+        return;
+      }
+      
+      const btn = document.querySelector('button[onclick="searchHospitalsByRegion()"]');
+      btn.disabled = true;
+      btn.innerText = 'Searching...';
+      updateStatusMessage('🔍 Searching region: ' + region);
+      
+      try {
+        const res = await window.findHospitalsByRegion(region);
+        if (res.results && res.results.length > 0) {
+          // Get center from first result
+          const center = res.results[0].location || { lat: 0, lng: 0 };
+          renderHospitalResults(res.results, center, 'region');
+        } else {
+          updateStatusMessage('⚠️ No hospitals found in that region — showing top hospitals');
+          // if user searched for KKD or similar, show KKD top hospitals; otherwise show KKD as safe fallback
+          showTopHospitalsKKD();
+        }
+      } catch (e) {
+        console.error('Region search error:', e);
+        updateStatusMessage('⚠️ Region search failed. Showing top hospitals instead.');
+        showTopHospitalsKKD();
+      } finally {
+        btn.disabled = false;
+        btn.innerText = 'Search';
+      }
+    }
+
+    // Top hospitals for KKD (static list used as default when user clicks Find Hospitals)
+    // Kakinada coordinates: ~16.9891, 82.2475
+    const topHospitalsKKD = [
+      { id: 'kkd-sri-vijaya', name: 'Sri Vijayalakshmi Multispeciality Hospital', address: 'Jagganpeta, Kakinada, Andhra Pradesh', phone: '070138 69229', rating: 5.0, notes: 'Highly recommended', open24: true, location: { lat: 16.9945, lng: 82.2654 } },
+      { id: 'kkd-city-multi', name: 'City Multispeciality Hospital', address: 'Kakinada, Andhra Pradesh', phone: '095848 13333', rating: 4.8, notes: 'Orthopedic | Neurology | ENT | Rheumatology', open24: true, location: { lat: 16.9876, lng: 82.2542 } },
+      { id: 'kkd-apollo', name: 'Apollo Hospitals Kakinada', address: 'Kakinada, Andhra Pradesh', phone: '080 6904 9760', rating: 4.8, website: '', notes: 'General hospital', open24: true, location: { lat: 16.9823, lng: 82.2658 } },
+      { id: 'kkd-inodaya', name: 'INODAYA HOSPITALS', address: 'Kakinada, Andhra Pradesh', phone: '0884 233 3033', rating: 4.8, notes: 'Multispeciality', open24: true, location: { lat: 16.9891, lng: 82.2475 } },
+      { id: 'kkd-1', name: 'KKD General Hospital', address: '12 Main St, KKD', phone: '+1-555-0101', rating: 4.5, location: { lat: 16.99, lng: 82.25 } },
+      { id: 'kkd-2', name: 'St. Mary Clinic', address: '4 Church Rd, KKD', phone: '+1-555-0102', rating: 4.2, location: { lat: 16.98, lng: 82.26 } },
+      { id: 'kkd-3', name: 'City Emergency Center', address: '88 Health Ave, KKD', phone: '+1-555-0103', rating: 4.7, location: { lat: 16.97, lng: 82.27 } }
+    ];
+
+    async function showTopHospitalsKKD() {
+      const list = document.getElementById('addressHospitalsList');
+      const mapDiv = document.getElementById('addressMap');
+      document.getElementById('addressPanel').style.display = 'block';
+      updateStatusMessage('Showing top hospitals in KKD');
+      list.innerHTML = '';
+      if (mapDiv) mapDiv.innerHTML = '<img src="public/kakinada-map.png" style="width:100%; height:100%; object-fit:cover; border-radius:8px;" alt="Kakinada Hospitals Map" />';
+
+      // Render each hospital
+      topHospitalsKKD.forEach((hosp) => {
+        const li = document.createElement('li');
+        li.style.cssText = 'padding:12px; margin-bottom:8px; border-radius:6px; background:#f9f9f9; border-left:4px solid #667eea;';
+
+        const directionsHref = hosp.location ?
+          `https://www.google.com/maps/search/?api=1&query=${hosp.location.lat},${hosp.location.lng}` :
+          `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(hosp.address || hosp.name)}`;
+
+        li.innerHTML = `
+          <strong style="font-size:14px; color: #333;">${hosp.name}</strong>
+          <div style="font-size:12px; color:#666; margin-top:4px;">📍 ${hosp.address}</div>
+          <div style="font-size:11px; color:#999; margin-top:2px;">⭐ ${hosp.rating || 'N/A'}</div>
+          <div style="margin-top:8px; display:flex; gap:6px; flex-wrap:wrap;">
+            <button class='btn-secondary' style='padding:6px 10px; font-size:11px;' onclick="alert('Phone: ${hosp.phone || 'N/A'}')">Contact</button>
+            <a class='btn-primary' href='${directionsHref}' target='_blank' style='text-decoration:none; padding:6px 10px; font-size:11px; display:inline-block; border-radius:6px; color:white;'>Directions</a>
+          </div>
+        `;
+
+        list.appendChild(li);
+      });
+
+      document.getElementById('hospitalCount').textContent = topHospitalsKKD.length;
+      updateStatusMessage(`✓ ${topHospitalsKKD.length} top hospitals (KKD)`);
+    }
+
+    // ============================================
+    // SCREEN NAVIGATION SYSTEM
+    // ============================================
+    
+    function validateAndGoToScreen(screenNum) {
+      // Validate based on current screen before moving
+      const currentScreen = state.currentScreen;
+      
+      if (currentScreen === 1 && screenNum === 2) {
+        // Validate symptoms are entered
+        const symptoms = document.getElementById('screen1Input').value.trim();
+        if (!symptoms) {
+          alert('⚠️ Please describe your symptoms to continue');
+          return;
+        }
+        state.symptoms = symptoms;
+      }
+      
+      if (currentScreen === 2 && screenNum === 3) {
+        // Validate duration is selected
+        if (!state.duration) {
+          alert('⚠️ Please select a duration to continue');
+          return;
+        }
+      }
+      
+      // Navigate to the screen
+      goToScreen(screenNum);
+    }
+    
+    function goToScreen(screenNum) {
+      // Hide all screens
+      document.querySelectorAll('.screen').forEach(screen => {
+        screen.classList.remove('active');
+      });
+      
+      // Show target screen
+      const targetScreen = document.getElementById(`screen-${screenNum}`);
+      if (targetScreen) {
+        targetScreen.classList.add('active');
+      }
+      
+      // Update state
+      state.currentScreen = screenNum;
+      updateProgress(screenNum);
+      
+      // Scroll to top of screen
+      window.scrollTo(0, 0);
+    }
+
+    function updateProgress(screenNum) {
+      // Update progress tracker visibility
+      const progressTracker = document.getElementById('progressTracker');
+      if (screenNum === 1 || screenNum === 4) {
+        // Hide on first and last screen
+        progressTracker.style.display = 'none';
+      } else {
+        progressTracker.style.display = 'flex';
+      }
+      
+      // Update active step
+      document.querySelectorAll('.progress-step').forEach((step, idx) => {
+        if (idx + 1 <= screenNum) {
+          step.classList.add('active');
+        } else {
+          step.classList.remove('active');
+        }
+      });
+    }
+
+    function selectSymptomQuick(element, symptom) {
+      const textarea = document.getElementById('screen1Input');
+      const currentValue = textarea.value.trim();
+      
+      element.classList.toggle('selected');
+      
+      if (element.classList.contains('selected')) {
+        if (currentValue) {
+          textarea.value = currentValue + ', ' + symptom;
+        } else {
+          textarea.value = symptom;
+        }
+      } else {
+        const symptoms = currentValue.split(',').map(s => s.trim()).filter(s => s !== symptom);
+        textarea.value = symptoms.join(', ');
+      }
+    }
+
+    function setDurationScreen(element, duration) {
+      state.duration = duration;
+      // remove selected from other buttons
+      document.querySelectorAll('#screen-2 .quick-btn').forEach(btn => btn.classList.remove('selected'));
+      if (element && element.classList) element.classList.add('selected');
+      console.log('Duration set to:', duration);
+    }
+
+    function setSeverityScreen(severity) {
+      state.severity = severity;
+      userSelectedSeverity = severity;
+      console.log('Severity set to:', severity);
+      
+      // Visual feedback - highlight selected button
+      document.querySelectorAll('button[id^="severity-"]').forEach(btn => {
+        btn.style.borderColor = 'var(--gray-light)';
+        btn.style.background = 'white';
+        btn.style.color = 'var(--primary-dark)';
+      });
+      
+      // Highlight the selected severity button
+      const selectedBtn = document.getElementById(`severity-${severity}`);
+      if (selectedBtn) {
+        selectedBtn.style.borderColor = severity === 'high' ? '#e74c3c' : (severity === 'medium' ? '#f39c12' : '#27ae60');
+        selectedBtn.style.background = severity === 'high' ? 'rgba(231, 76, 60, 0.1)' : (severity === 'medium' ? 'rgba(243, 156, 18, 0.1)' : 'rgba(39, 174, 96, 0.1)');
+        selectedBtn.style.color = severity === 'high' ? '#e74c3c' : (severity === 'medium' ? '#f39c12' : '#27ae60');
+      }
+    }
+
+    function analyzeAndShowResults() {
+      // Get the symptom input from screen 1
+      const symptomInput = document.getElementById('screen1Input');
+      state.symptoms = symptomInput.value.trim();
+      
+      if (!state.symptoms) {
+        alert('⚠️ Please describe your symptoms first');
+        return;
+      }
+      
+      if (!state.duration) {
+        alert('⚠️ Please select a duration');
+        return;
+      }
+      
+      if (!state.severity) {
+        alert('⚠️ Please select a severity level');
+        return;
+      }
+      
+      // Generate results based on symptoms
+      generateAndDisplayResults();
+      
+      // Go to results screen
+      goToScreen(4);
+    }
+
+    function generateAndDisplayResults() {
+      const symptomText = state.symptoms.toLowerCase();
+      
+      // Find matching symptoms from database
+      let matchedSymptom = null;
+      for (const [symptom, data] of Object.entries(symptomDatabase)) {
+        if (symptomText.includes(symptom)) {
+          matchedSymptom = symptom;
+          break;
+        }
+      }
+      
+      const data = matchedSymptom ? symptomDatabase[matchedSymptom] : getDefaultAnalysis();
+      
+      // Update result summary
+      document.getElementById('resultSummary').innerHTML = `
+        <strong>Symptoms:</strong> ${state.symptoms}<br>
+        <strong>Duration:</strong> ${state.duration}<br>
+        <strong>Severity:</strong> ${state.severity}
+      `;
+      
+      // Update conditions
+      const conditionsList = document.getElementById('resultConditions');
+      conditionsList.innerHTML = '';
+      data.conditions.forEach(cond => {
+        const li = document.createElement('li');
+        li.style.marginBottom = '12px';
+        li.innerHTML = `<strong style="color: var(--primary-dark);">${cond.name}</strong> (${cond.probability}% probability)`;
+        conditionsList.appendChild(li);
+      });
+      
+      // Update recommendations
+      const recList = document.getElementById('resultRecommendations');
+      recList.innerHTML = '';
+      data.recommendations.forEach((rec, idx) => {
+        const li = document.createElement('li');
+        li.style.marginBottom = '10px';
+        li.innerHTML = `<strong>${idx + 1}.</strong> ${rec}`;
+        recList.appendChild(li);
+      });
+    }
+
+    function getDefaultAnalysis() {
+      return {
+        conditions: [
+          { name: 'General Viral Infection', probability: 50 },
+          { name: 'Common Cold', probability: 40 },
+          { name: 'Flu-like Illness', probability: 30 }
+        ],
+        recommendations: [
+          'Rest and get adequate sleep (7-9 hours)',
+          'Stay hydrated by drinking water, herbal tea, and warm soups',
+          'Use over-the-counter pain relievers as needed',
+          'Monitor your symptoms and keep a record',
+          'Seek medical attention if symptoms worsen or persist beyond 5 days'
+        ]
+      };
+    }
+
+    function openHospitalSearchPanel() {
+      // Show the hospital search panel
+      document.getElementById('hospitalSearchPanel').style.display = 'block';
+      
+      // Populate patient details summary
+      document.getElementById('summarySymptoms').textContent = state.symptoms || 'Not specified';
+      document.getElementById('summaryDuration').textContent = state.duration || 'Not specified';
+      document.getElementById('summarySeverity').textContent = state.severity || 'Not specified';
+      
+      // Clear hospital list - don't show hospitals until user searches
+      document.getElementById('hospitalsList').innerHTML = '';
+      document.getElementById('hospitalCount').textContent = '0';
+      document.getElementById('hospitalStatus').style.display = 'none';
+    }
+
+    function closeHospitalSearchPanel() {
+      document.getElementById('hospitalSearchPanel').style.display = 'none';
+    }
+
+    function showDefaultHospitals() {
+      const hospitals = generateDefaultHospitals();
+      displayHospitals(hospitals);
+    }
+
+    function displayHospitals(hospitals) {
+      const listEl = document.getElementById('hospitalsList');
+      const countEl = document.getElementById('hospitalCount');
+      
+      listEl.innerHTML = '';
+      countEl.textContent = hospitals.length;
+      
+      hospitals.forEach(hosp => {
+        const li = document.createElement('li');
+        li.style.cssText = 'padding: 16px; margin-bottom: 12px; border: 1px solid var(--gray-light); border-radius: 10px; background: white;';
+        li.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: start;">
+            <div style="flex: 1;">
+              <strong style="font-size: 16px; color: var(--primary-dark); display: block; margin-bottom: 4px;">${hosp.name}</strong>
+              <div style="font-size: 13px; color: var(--gray); margin-bottom: 8px;">📍 ${hosp.address}</div>
+              <div style="font-size: 13px; color: var(--gray); margin-bottom: 4px;">⭐ ${hosp.rating} | ${hosp.speciality}</div>
+              <div style="font-size: 13px; color: var(--primary); margin-bottom: 8px;">📞 ${hosp.phone}</div>
+            </div>
+            <div>
+              <button class="btn-primary" onclick="selectHospital('${hosp.name}')" style="padding: 8px 12px; font-size: 12px;">Select</button>
+            </div>
+          </div>
+        `;
+        listEl.appendChild(li);
+      });
+    }
+
+    function searchHospitalsByAddress() {
+      const address = document.getElementById('addressInput').value.trim();
+      if (!address) {
+        alert('⚠️ Please enter an address');
+        return;
+      }
+      
+      const statusEl = document.getElementById('hospitalStatus');
+      statusEl.style.display = 'block';
+      statusEl.textContent = `🔍 Searching for hospitals in ${address}...`;
+      
+      // Simulate search - in real app, this would call an API
+      setTimeout(() => {
+        const hospitals = generateHospitalsForLocation(address);
+        displayHospitals(hospitals);
+        statusEl.textContent = `✓ Found ${hospitals.length} hospitals in ${address}`;
+      }, 1000);
+    }
+
+    function searchHospitalsByGPS() {
+      const statusEl = document.getElementById('hospitalStatus');
+      statusEl.style.display = 'block';
+      statusEl.textContent = '📍 Getting your location...';
+      
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const { latitude, longitude } = position.coords;
+            statusEl.textContent = `✓ Found hospitals near your location (${latitude.toFixed(2)}, ${longitude.toFixed(2)})`;
+            showDefaultHospitals();
+          },
+          (error) => {
+            statusEl.textContent = '❌ Could not access location. Please use address search instead.';
+          }
+        );
+      } else {
+        statusEl.textContent = '❌ Geolocation not supported. Please use address search.';
+      }
+    }
+
+    function searchHospitalsByCity() {
+      const city = document.getElementById('citySelect').value;
+      if (!city) return;
+      
+      const statusEl = document.getElementById('hospitalStatus');
+      statusEl.style.display = 'block';
+      const cityName = cityLocations[city] ? cityLocations[city].region : city;
+      statusEl.textContent = `🔍 Searching hospitals in ${cityName}...`;
+      
+      setTimeout(() => {
+        const hospitals = generateHospitalsForLocation(city);
+        displayHospitals(hospitals);
+        statusEl.textContent = `✓ Found ${hospitals.length} hospitals in ${cityName}`;
+      }, 1000);
+    }
+
+    function selectHospital(hospitalName) {
+      alert(`✓ Selected: ${hospitalName}\n\nYou can now proceed with your consultation or request an appointment.`);
+    }
+
+
+    function openConsultModal() {
+      document.getElementById('consultModal').style.display = 'flex';
+    }
+
+    function closeConsultModal() {
+      document.getElementById('consultModal').style.display = 'none';
+    }
+
+    function submitConsultRequest() {
+      const name = document.getElementById('consultName').value.trim();
+      const email = document.getElementById('consultEmail').value.trim();
+      
+      if (!name || !email) {
+        alert('Please fill in your name and email');
+        return;
+      }
+      
+      // Here you would normally send this to a server
+      alert(`Thank you, ${name}! A healthcare professional will contact you at ${email} shortly.`);
+      closeConsultModal();
+    }
+
+    // Open digital records (placeholder)
+    function openDigitalRecords() {
+      // In a real app this would authenticate and open secure records
+      alert('Opening Digital Health Records (placeholder).');
+    }
+
+    // Download a simple health summary file
+    function downloadHealthSummary() {
+      const summary = `Health Summary\nSymptoms: ${state.symptoms || 'N/A'}\nDuration: ${state.duration || 'N/A'}\nSeverity: ${state.severity || 'N/A'}`;
+      const blob = new Blob([summary], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'health-summary.txt';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+  </script>
+</body>
+</html>
